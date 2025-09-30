@@ -153,6 +153,11 @@ if ($utilisateur_connecte) {
     <footer>
         <div class="container">
             <p>&copy; 2024 Livre d'Or. Tous droits réservés.</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/nordine-aitouaraz/Livre-d-or-2" target="_blank" style="color: #3498db; text-decoration: none;">
+                    📂 Voir le code source sur GitHub
+                </a>
+            </p>
         </div>
     </footer>
 
