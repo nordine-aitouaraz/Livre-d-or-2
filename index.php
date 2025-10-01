@@ -42,6 +42,11 @@ if ($utilisateur_connecte) {
                         <li class="nav-item">
                             <a href="profil.php" class="nav-link">Profil</a>
                         </li>
+                        <?php if ($_SESSION['utilisateur_is_admin'] ?? false): ?>
+                            <li class="nav-item">
+                                <a href="admin.php" class="nav-link">Administration</a>
+                            </li>
+                        <?php endif; ?>
                         <li class="nav-item">
                             <a href="deconnexion.php" class="nav-link">Déconnexion</a>
                         </li>

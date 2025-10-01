@@ -19,17 +19,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo = new PDO('mysql:host=localhost;dbname=nordine-ait-ouaraz_livreor;charset=utf8', 'nordine-ouaraz', 'Nonozdu92');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Rechercher l'utilisateur par login
-            $stmt = $pdo->prepare("SELECT id, nom, prenom, login, mot_de_passe FROM utilisateurs WHERE login = ?");
+            // Rechercher l'utilisateur par login (avec support is_admin)
+            $stmt = $pdo->prepare("SELECT id, nom, prenom, login, mot_de_passe, COALESCE(is_admin, 0) as is_admin FROM utilisateurs WHERE login = ?");
             $stmt->execute([$login]);
             $utilisateur = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if ($utilisateur && password_verify($password, $utilisateur['mot_de_passe'])) {
+            $passwordOk = false;
+            if ($utilisateur) {
+                // Vérifier le mot de passe - essayer MD5 d'abord (pour admin), puis password_hash
+                if (md5($password) === $utilisateur['mot_de_passe']) {
+                    $passwordOk = true;
+                } elseif (password_verify($password, $utilisateur['mot_de_passe'])) {
+                    $passwordOk = true;
+                }
+            }
+            
+            if ($utilisateur && $passwordOk) {
                 // Connexion réussie
                 $_SESSION['utilisateur_id'] = $utilisateur['id'];
                 $_SESSION['utilisateur_nom'] = $utilisateur['nom'];
                 $_SESSION['utilisateur_prenom'] = $utilisateur['prenom'];
                 $_SESSION['utilisateur_login'] = $utilisateur['login'];
+                $_SESSION['utilisateur_is_admin'] = $utilisateur['is_admin'];
                 
                 // Message de bienvenue
                 $_SESSION['message_bienvenue'] = "Bienvenue " . $utilisateur['prenom'] . " " . $utilisateur['nom'] . " ! Vous êtes maintenant connecté(e).";
