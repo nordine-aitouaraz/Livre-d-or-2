@@ -3,7 +3,7 @@ session_start();
 
 // Configuration de la base de données
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=livreor;charset=utf8', 'root', '');
+    $pdo = new PDO('mysql:host=localhost;dbname=nordine-ait-ouaraz_livreor;charset=utf8', 'nordine-ouaraz', 'Nonozdu92');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
