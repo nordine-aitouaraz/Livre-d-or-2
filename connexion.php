@@ -19,8 +19,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo = new PDO('mysql:host=localhost;dbname=nordine-ait-ouaraz_livreor;charset=utf8', 'nordine-ouaraz', 'Nonozdu92');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Rechercher l'utilisateur par login (avec support is_admin)
-            $stmt = $pdo->prepare("SELECT id, nom, prenom, login, mot_de_passe, COALESCE(is_admin, 0) as is_admin FROM utilisateurs WHERE login = ?");
+            // Vérifier d'abord si la colonne is_admin existe
+            $stmt = $pdo->query("SHOW COLUMNS FROM utilisateurs LIKE 'is_admin'");
+            $columnExists = $stmt->rowCount() > 0;
+            
+            if ($columnExists) {
+                // La colonne existe, l'utiliser
+                $stmt = $pdo->prepare("SELECT id, nom, prenom, login, mot_de_passe, COALESCE(is_admin, 0) as is_admin FROM utilisateurs WHERE login = ?");
+            } else {
+                // La colonne n'existe pas, utiliser 0 par défaut et ajouter la colonne
+                $stmt = $pdo->prepare("SELECT id, nom, prenom, login, mot_de_passe, 0 as is_admin FROM utilisateurs WHERE login = ?");
+                
+                // Ajouter la colonne is_admin pour les prochaines fois
+                try {
+                    $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN is_admin TINYINT(1) DEFAULT 0");
+                } catch (PDOException $e) {
+                    // Ignore si la colonne existe déjà ou autre erreur
+                }
+            }
+            
             $stmt->execute([$login]);
             $utilisateur = $stmt->fetch(PDO::FETCH_ASSOC);
             
