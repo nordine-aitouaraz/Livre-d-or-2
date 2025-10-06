@@ -97,6 +97,9 @@ body {
     height: calc(100vh - 70px);
     padding-top: 2rem;
   }
+  header {
+    position: fixed;
+  }
 
   .nav-menu.active {
     left: 0;
